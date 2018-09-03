@@ -11,7 +11,6 @@
 
 <meta name="author" content="Luc Anselin and Grant Morrison" />
 
-<meta name="date" content="2018-08-07" />
 
 <title>Spatial Data Handling</title>
 
@@ -126,7 +125,7 @@ $(document).ready(function () {
 <h1 class="title toc-ignore">Spatial Data Handling</h1>
 <h3 class="subtitle"><em>R Notes</em></h3>
 <h4 class="author"><em>Luc Anselin and Grant Morrison<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></em></h4>
-<h4 class="date"><em>08/07/2018</em></h4>
+<h4 class="date"><em>latest update 09/03/2018</em></h4>
 
 </div>
 
@@ -215,7 +214,7 @@ $(document).ready(function () {
 <h4>R Commands used</h4>
 <p>Below follows a list of the commands used in this notebook. For further details and a comprehensive list of options, please consult the <a href="https://www.rdocumentation.org">R documentation</a>.</p>
 <ul>
-<li><p><strong>base R</strong>: <code>install.packages</code>, <code>library</code>, <code>head</code>, <code>dim</code>, <code>class</code>, <code>as.Date</code>, <code>names</code>, <code>!is.na</code>, <code>is.numeric</code>, <code>as.integer</code>, <code>is.integer</code>, <code>length</code>, <code>strsplit</code>, <code>unlist</code>, <code>for</code>, <code>vector</code>, <code>substr</code>, <code>gsub</code>, <code>as.numeric</code>, <code>data.frame</code></p></li>
+<li><p><strong>base R</strong>: <code>setwd</code>, <code>install.packages</code>, <code>library</code>, <code>head</code>, <code>dim</code>, <code>class</code>, <code>as.Date</code>, <code>names</code>, <code>!is.na</code>, <code>is.numeric</code>, <code>as.integer</code>, <code>is.integer</code>, <code>length</code>, <code>strsplit</code>, <code>unlist</code>, <code>for</code>, <code>vector</code>, <code>substr</code>, <code>gsub</code>, <code>as.numeric</code>, <code>data.frame</code></p></li>
 <li><p><strong>RSocrata</strong>: <code>read.socrata</code></p></li>
 <li><p><strong>tidyverse</strong>: <code>filter</code>, <code>%&gt;%</code> (pipe), <code>select</code> (with renaming), <code>count</code>, <code>rename</code>, <code>mutate</code></p></li>
 <li><p><strong>lubridate</strong>: <code>year</code>, <code>month</code></p></li>
@@ -233,12 +232,12 @@ $(document).ready(function () {
 <h3>Loading packages</h3>
 <p>First, we load all the required packages using the <code>library</code> command. If you don’t have some of these in your system, make sure to install them first as well as their dependencies.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> You will get an error message if something is missing. If needed, just install the missing piece and everything will work after that.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ───────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
 ## ✔ tibble  1.4.2     ✔ dplyr   0.7.6
 ## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
 ## ✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
-<pre><code>## ── Conflicts ──────────────────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>## ── Conflicts ───────────────────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(lubridate)</code></pre>
@@ -314,8 +313,8 @@ head(vehicle.data)</code></pre>
 ## 6        Yellow                       2      1171572      1899604    60661</code></pre>
 <p>A quick glance at the table reveals quite a bit of missing information, something we will have to deal with. We also check the dimension of this data frame using the <code>dim</code> command:</p>
 <pre class="r"><code>dim(vehicle.data)</code></pre>
-<pre><code>## [1] 201299     26</code></pre>
-<p>The table has 200,657 observations on 26 variables (the number of observations may be different as the table is constantly updated).</p>
+<pre><code>## [1] 203657     26</code></pre>
+<p>The table has 203,657 observations on 26 variables (the number of observations shown may be slightly different as the table is constantly updated).</p>
 <p>In RStudio, the type of the variable in each column is listed under its name. For example, under <strong>creation_date</strong>, we see <strong>S3: POSIXct</strong>. You can also find out the same information by applying a <code>class</code> command to the variable <strong>vehicle.data$creation_date</strong>, as in</p>
 <pre class="r"><code>class(vehicle.data$creation_date)</code></pre>
 <pre><code>## [1] &quot;POSIXct&quot; &quot;POSIXt&quot;</code></pre>
@@ -483,7 +482,7 @@ class(vehicle.points)</code></pre>
 <div id="abandoned-vehicles-by-community-area" class="section level2 unnumbered">
 <h2>Abandoned Vehicles by Community Area</h2>
 <p>At this point, we will go about things in a slightly different way from how they are illustrated in the GeoDa workbook example. As it turns out, some of the points have missing community area information, which is a critical element to compute the number of abandoned cars at that scale. In GeoDa, we used a visual approach to obtain the missing information. Here, we will exploit some of the GIS functionality in <strong>sf</strong> to carry out a <strong>spatial join</strong>. This boils down to identifying which points belong to each community area (a so-called <em>point in polygon query</em>) and assigning the corresponding community area identifier to each point.</p>
-<p>We proceed in three steps. First, we create a simple features spatial polygon object with the boundaries of the community areas, which we download from the Chicago Open Data portal. Next, we carry out a spatial join between our points object and the polygon object to assing a community area code to each point. Finally, we compute the point count by community area.</p>
+<p>We proceed in three steps. First, we create a simple features spatial polygon object with the boundaries of the community areas, which we download from the Chicago Open Data portal. Next, we carry out a spatial join between our points object and the polygon object to assign a community area code to each point. Finally, we compute the point count by community area.</p>
 <div id="community-area-boundary-file" class="section level3 unnumbered">
 <h3>Community Area boundary file</h3>
 <p>We resort to the City of Chicago open data portal for the boundary file of the community areas. From the opening screen, select the button for <a href="https://data.cityofchicago.org/browse?category=Facilities+%26+Geographic%20Boundaries">Facilities &amp; Geo Boundaries</a>. This yields a list of different boundary files for a range of geographic areal units. The one for the community areas is <a href="https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas-current-/cauq-8yn6">Boundaries - Community Areas (current)</a>. This brings up an overview map of the geography of the community areas of Chicago. Of course, we could simply select one of the export buttons to download the files, but we want to do this programmatically. As it turns out, <strong>sf</strong> can read a <strong>geojson</strong> formatted file directly from the web, and we will exploit that functionality.</p>
