@@ -11,7 +11,6 @@
 
 <meta name="author" content="Luc Anselin and Grant Morrison" />
 
-<meta name="date" content="2018-08-09" />
 
 <title>Exploratory Data Analysis 1</title>
 
@@ -126,7 +125,7 @@ $(document).ready(function () {
 <h1 class="title toc-ignore">Exploratory Data Analysis 1</h1>
 <h3 class="subtitle"><em>R Notes</em></h3>
 <h4 class="author"><em>Luc Anselin and Grant Morrison<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></em></h4>
-<h4 class="date"><em>08/09/2018</em></h4>
+<h4 class="date"><em>latest update 09/03/2018</em></h4>
 
 </div>
 
@@ -209,7 +208,7 @@ $(document).ready(function () {
 <h4>R Commands used</h4>
 <p>Below follows a list of the commands used in this notebook. For further details and a comprehensive list of options, please consult the <a href="https://www.rdocumentation.org">R documentation</a>.</p>
 <ul>
-<li><p><strong>Base R</strong>: <code>install.packages</code>, <code>library</code>, <code>head</code>, <code>names</code>, <code>summary</code>, <code>range</code>, <code>var</code>, <code>sd</code>,<code>pdf</code>,<code>dev.off</code>,<code>saveRDS</code>,<code>readRDS</code>, <code>function</code>, <code>lm</code>, <code>str</code>, <code>dim</code></p></li>
+<li><p><strong>Base R</strong>: <code>setwd</code>, <code>install.packages</code>, <code>library</code>, <code>head</code>, <code>names</code>, <code>summary</code>, <code>range</code>, <code>var</code>, <code>sd</code>,<code>pdf</code>,<code>dev.off</code>,<code>saveRDS</code>,<code>readRDS</code>, <code>function</code>, <code>lm</code>, <code>str</code>, <code>dim</code></p></li>
 <li><p><strong>tidyverse</strong>: <code>read_csv</code>, <code>rename</code>, <code>mutate</code>, <code>if_else</code>, <code>filter</code></p></li>
 <li><p><strong>ggplot2</strong>: <code>ggplot</code>, <code>geom_histogram</code>, <code>bins</code>, <code>theme_classic</code>, <code>theme_minimal</code>, <code>xlab</code>, <code>ylab</code>, <code>ggtitle</code>, <code>theme</code>, <code>layer_data</code>, <code>ggsave</code>, <code>geom_boxplot</code>, <code>stat_boxplot</code>, <code>geom_point</code>, <code>coord_fixed</code>, <code>geom_smooth</code>, <code>stat_smooth</code>, <code>labs</code>, <code>scale_color_manual</code></p></li>
 <li><p><strong>ggthemes</strong>: <code>theme_tufte</code></p></li>
@@ -226,12 +225,12 @@ $(document).ready(function () {
 <h3>Load packages</h3>
 <p>First, we load all the required packages using the <code>library</code> command. If you don’t have some of these in your system, make sure to install them first as well as their dependencies.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> You will get an error message if something is missing. If needed, just install the missing piece and everything will work after that. Note that <strong>ggplot2</strong> does not need to be loaded separately since it is included in the <strong>tidyverse</strong> package collection.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ───────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
 ## ✔ tibble  1.4.2     ✔ dplyr   0.7.6
 ## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
 ## ✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
-<pre><code>## ── Conflicts ──────────────────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>## ── Conflicts ───────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(ggthemes)
@@ -320,7 +319,7 @@ names(nyc.data)</code></pre>
 <h3>A quick introduction to <strong>ggplot</strong></h3>
 <p>We will be using the commands in the <strong>ggplot2</strong> package for the descriptive statistics plots. There are many options to create nice looking graphs in R, including the functionality in base R, but we chose <strong>ggplot2</strong> for its clean logic and its similarity to the <strong>tmap</strong> package that we already encountered (in fact, <strong>tmap</strong> uses the same layered logic as <strong>ggplot</strong>).<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a></p>
 <p>An in-depth introduction to <strong>ggplot</strong> is beyond our scope, but a quick overview can be found in the <a href="http://r4ds.had.co.nz/data-visualisation.html">Data Visualization</a> chapter of Wickham and Grolemund’s <em>R for Data Science</em> book, and full details are covered in Wickham’s <em>ggplot2: elegant graphics for data analysis (2nd Edition)</em> (Springer Verlag, 2016).</p>
-<p>The logic behind <strong>ggplot</strong> is an implementation of Wilkinson’s <em>grammar for graphics</em>, using the concept of <em>layers</em>. These are the components that make up a plot, such as a <em>data set</em>, <em>aesthetic mappings</em> (variables for different aspects of the graph, such as the x and y-axes, colors, shapes, etc.), <em>statistical transformations</em>, a <em>geometric object</em> and position adjustments. Several layers can be drawn on top of each other, providing the ability to create incredibly complext graphs.</p>
+<p>The logic behind <strong>ggplot</strong> is an implementation of Wilkinson’s <em>grammar for graphics</em>, using the concept of <em>layers</em>. These are the components that make up a plot, such as a <em>data set</em>, <em>aesthetic mappings</em> (variables for different aspects of the graph, such as the x and y-axes, colors, shapes, etc.), <em>statistical transformations</em>, a <em>geometric object</em> and position adjustments. Several layers can be drawn on top of each other, providing the ability to create incredibly complex graphs.</p>
 <p>For now, the main parts to concentrate on are the data set and the aesthetics, or <code>aes</code>. The latter are typically (at least) the variables to be plotted. These are usually declared in the main <strong>ggplot</strong> command, e.g., <code>ggplot(dataset,aes(x=var1,y=var2))</code> and apply to all the following layers. However, they can also be specified for each layer individually.</p>
 <p>Next follow one or more geometric objects, <code>geom_*</code> and various adjustments, added to the first command by means of a plus sign, just as we saw how a <strong>tmap</strong> choropleth map was constructed.</p>
 <p>The terminology may seem a little unfamiliar at first, but as long as you remember that <code>aes</code> are the variables and the <code>geom_*</code> are the plot types, you will be on your way.</p>
@@ -574,7 +573,7 @@ base.plt + geom_boxplot() +
 </div>
 <div id="bivariate-analysis-the-scatter-plot" class="section level2 unnumbered">
 <h2>Bivariate Analysis: The Scatter Plot</h2>
-<p>The scatter plot shows the relationship between two variables as points with (x, y) coordinates matching the value for each variable, one on the x-axis, the other on the y-axis. In <strong>ggplot</strong> the scatter plot is constructed by means of a <code>geom_point</code>. The aesthetics are mapped to the variables for the x and y axis.</p>
+<p>The scatter plot shows the relationship between two variables as points with cartesian (x, y) coordinates matching the value for each variable, one on the x-axis, the other on the y-axis. In <strong>ggplot</strong> the scatter plot is constructed by means of a <code>geom_point</code>. The aesthetics are mapped to the variables for the x and y axis.</p>
 <p>We mimic the example in the GeoDa workbook and use <strong>kids2000</strong> for <code>x</code>, and <strong>pubast00</strong> for <code>y</code>. The bare bones scatter plot is obtained as follows:</p>
 <pre class="r"><code>ggplot(data=nyc.data,aes(x=kids2000,y=pubast00)) +
    geom_point()</code></pre>
