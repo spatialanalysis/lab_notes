@@ -125,7 +125,7 @@ $(document).ready(function () {
 <h1 class="title toc-ignore">Spatial Data Handling</h1>
 <h3 class="subtitle"><em>R Notes</em></h3>
 <h4 class="author"><em>Luc Anselin and Grant Morrison<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a></em></h4>
-<h4 class="date"><em>latest update 09/03/2018</em></h4>
+<h4 class="date"><em>latest update 09/14/2018</em></h4>
 
 </div>
 
@@ -232,12 +232,12 @@ $(document).ready(function () {
 <h3>Loading packages</h3>
 <p>First, we load all the required packages using the <code>library</code> command. If you don’t have some of these in your system, make sure to install them first as well as their dependencies.<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a> You will get an error message if something is missing. If needed, just install the missing piece and everything will work after that.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
 ## ✔ tibble  1.4.2     ✔ dplyr   0.7.6
 ## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
 ## ✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
-<pre><code>## ── Conflicts ───────────────────────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>## ── Conflicts ───────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
 ## ✖ dplyr::filter() masks stats::filter()
 ## ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(lubridate)</code></pre>
@@ -313,7 +313,7 @@ head(vehicle.data)</code></pre>
 ## 6        Yellow                       2      1171572      1899604    60661</code></pre>
 <p>A quick glance at the table reveals quite a bit of missing information, something we will have to deal with. We also check the dimension of this data frame using the <code>dim</code> command:</p>
 <pre class="r"><code>dim(vehicle.data)</code></pre>
-<pre><code>## [1] 203657     26</code></pre>
+<pre><code>## [1] 204693     26</code></pre>
 <p>The table has 203,657 observations on 26 variables (the number of observations shown may be slightly different as the table is constantly updated).</p>
 <p>In RStudio, the type of the variable in each column is listed under its name. For example, under <strong>creation_date</strong>, we see <strong>S3: POSIXct</strong>. You can also find out the same information by applying a <code>class</code> command to the variable <strong>vehicle.data$creation_date</strong>, as in</p>
 <pre class="r"><code>class(vehicle.data$creation_date)</code></pre>
@@ -594,7 +594,7 @@ head(veh.cnts)</code></pre>
 </div>
 <div id="mapping-the-vehicle-counts" class="section level3 unnumbered">
 <h3>Mapping the vehicle counts</h3>
-<p>At this point, we have a polygon layer with the community area boundaries and some identifiers (<strong>chicago.comm</strong>) and a data frame with the community identifier and the aggregate vehicle count (<strong>veh.cnts</strong>). In order to map the vehicle counts by community area, we need to <code>join</code> the two tables. We use the <code>left_join</code> command and use <strong>area_num_1</strong> as the key for the first table (the community area boundaries), and <strong>comm</strong> as the key for the second table (the vehicle counts). Since we assured that both variables are now integers, the join will work (if one were a character and the other integer, there would be an error message). Note how in the command below, the two keys can be different, which makes for a slightly more complex <code>by</code> statement.</p>
+<p>At this point, we have a polygon layer with the community area boundaries and some identifiers (<strong>chicago.comm</strong>) and a data frame with the community identifier and the aggregate vehicle count (<strong>veh.cnts</strong>). In order to map the vehicle counts by community area, we need to <code>join</code> the two tables. We use the <code>left_join</code> command and use <strong>area_num_1</strong> as the key for the first table (the community area boundaries), and <strong>comm</strong> as the key for the second table (the vehicle counts). Since we assured that both variables are now integers, the join will work (if one were a character and the other integer, there would be an error message). Note how in the command below, the two keys can have different variable names (but they must have the same values), which is made explicit in the <code>by</code> statement.</p>
 <pre class="r"><code>chicago.comm &lt;- left_join(chicago.comm,veh.cnts, by = c(&quot;area_num_1&quot; = &quot;comm&quot;))</code></pre>
 <p>We can double check that the vehicle counts were added using the <code>head</code> command.</p>
 <pre class="r"><code>head(chicago.comm)</code></pre>
@@ -982,7 +982,7 @@ head(chicago.comm)</code></pre>
 <p>When compared to the total counts, we see quite a different spatial distribution. In particular, the locations of the highest ratios are quite different from those of the highest counts. As a rule, one should <em>never</em> create a choropleth map of a spatially extensive variable, unless the size of the areal units is somehow controlled for (e.g., equal area grid cells, or equal population zones).</p>
 <div id="optional---save-the-community-area-file-as-a-shape-file" class="section level4">
 <h4>Optional - save the community area file as a shape file</h4>
-<p>Finally, we can write the community area layer to the working directory. Note that, so far, all operations have been carried out in memory, and when you close the program, everything may be lost (unless you save your workspace).</p>
+<p>Finally, we can write the community area layer to the working directory. Note that, so far, all operations have been carried out in memory, and when you close the program, everything will be lost (unless you save your workspace).</p>
 <p>We can write the community area to a shape file (actually, four files contained in a directory) by means of the <strong>sf</strong> command <code>st_write</code>. This command has many options, but we just use the minimal ones. The <strong>chicago.comm</strong> object will be written to a set of files in the directory <strong>chicago_vehicles</strong> using the <strong>ESRI Shapefile</strong> format. Note that if the directory already exists, it should be deleted or renamed first, since <code>st_write</code> only creates a new directory. Otherwise, there will be an error message.</p>
 <pre class="r"><code>st_write(chicago.comm,&quot;chicago_vehicles&quot;,driver=&quot;ESRI Shapefile&quot;)</code></pre>
 <pre><code>## Writing layer `chicago_vehicles&#39; to data source `chicago_vehicles&#39; using driver `ESRI Shapefile&#39;
